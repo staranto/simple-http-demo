@@ -1,0 +1,4 @@
+.DS_Store
+*.vmwarevm
+.vscode
+**/build/*

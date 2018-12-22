@@ -1,0 +1,12 @@
+image: staranto/simple-http:latest
+manifests:
+  -
+    image: staranto/simple-http:arm-0.1
+    platform:
+      architecture: arm
+      os: linux
+  -
+    image: staranto/simple-http:amd64-0.1
+    platform:
+      architecture: amd64
+      os: linux
