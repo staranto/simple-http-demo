@@ -37,7 +37,6 @@ func inc(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("host=%s color=%s instanceCount=%s hostCount=%d globalCount=%d",
 		data.Host, data.Color, instanceCount, data.Count, globalCount)
-	}
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
