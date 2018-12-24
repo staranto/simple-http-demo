@@ -1,12 +1,13 @@
-image: staranto/simple-http:latest
+image: staranto/simple-http-counter:latest
+
 manifests:
   -
-    image: staranto/simple-http:arm-0.1
+    image: staranto/simple-http-counter:arm64
     platform:
       architecture: arm
       os: linux
   -
-    image: staranto/simple-http:amd64-0.1
+    image: staranto/simple-http-counter:amd64
     platform:
       architecture: amd64
       os: linux
