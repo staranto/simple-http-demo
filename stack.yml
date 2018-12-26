@@ -3,11 +3,11 @@ version: "3"
 services:
   
   counter:
-    image: staranto/simple-http-counter:latest
+    image: staranto/simple-http-counter:arm
     ports:
       - "8181:8181"
 
   pounder:
-    image: staranto/simple-http-pounder:latest
+    image: staranto/simple-http-pounder:arm
     deploy:
       replicas: 2
