@@ -3,11 +3,16 @@ version: "3"
 services:
   
   counter:
-    image: staranto/simple-http-counter:arm
+    image: staranto/simple-http-counter:0.1
     ports:
       - "8181:8181"
 
   pounder:
-    image: staranto/simple-http-pounder:arm
+    image: staranto/simple-http-pounder:0.1
+    environment:
+      NODE: "{{.Node.Hostname}}"
+    depends_on:
+      - "counter"
     deploy:
-      replicas: 2
+      replicas: 4
+
