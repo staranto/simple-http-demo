@@ -3,12 +3,14 @@ version: "3"
 services:
   
   counter:
-    image: staranto/simple-http-counter:0.1
+    image: staranto/simple-http-counter:latest
+    environment:
+      NODE: "{{.Node.Hostname}}"
     ports:
       - "8181:8181"
 
   pounder:
-    image: staranto/simple-http-pounder:0.1
+    image: staranto/simple-http-pounder:latest
     environment:
       NODE: "{{.Node.Hostname}}"
     depends_on:
