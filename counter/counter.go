@@ -49,6 +49,7 @@ func inc(w http.ResponseWriter, r *http.Request) {
 
 func get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	freshCount, staleCount := 0, 0
 	showStale := vars["stale"]
 
 	node := os.Getenv("NODE")
@@ -56,13 +57,13 @@ func get(w http.ResponseWriter, r *http.Request) {
 		node = "unknown"
 	}
 
-	fmt.Fprintln(w, "<html><body style='font-size: 22px'><pre>")
+	fmt.Fprintln(w, "<html><head><meta http-equiv='refresh' content='3'></head><body style='font-size: 22px'><pre>")
 	fmt.Fprintf(w, "Node: %s\n", node)
 	fmt.Fprintf(w, "Started: %s\n", started.Format("2006-01-02 15:04:05"))
 	fmt.Fprintf(w, "Current: %s\n", time.Now().Format("2006-01-02 15:04:05"))
-	fmt.Fprintf(w, "Total Requests: %d", globalCount)
+	fmt.Fprintf(w, "Total Requests: %d\n", globalCount)
 
-	fmt.Fprintln(w, "<table>")
+	table := "<table>"
 
 	hostnames := make([]string, 0, len(hosts))
 	for name := range hosts {
@@ -75,7 +76,10 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 		color := v.Color
 		threshold := time.Now().UnixNano() / int64(time.Millisecond)
-		if v.LastSeen < threshold-30000 {
+		if v.LastSeen > threshold-10000 {
+			freshCount++
+		} else {
+			staleCount++
 			if showStale == "stale" {
 				color = "grey"
 			} else {
@@ -83,17 +87,27 @@ func get(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		fmt.Fprintf(w, "<tr style='font-size: 22px'><td bgcolor='%s'>&nbsp;</td><td>%s (%s)</td><td>: %d</td></tr>",
+		table += fmt.Sprintf("<tr style='font-size: 22px'><td bgcolor='%s'>&nbsp;</td><td>%s (%s)</td><td>: %d</td></tr>",
 			color, v.Host, v.Node, v.Count)
 	}
-	fmt.Fprintln(w, "</table></pre></body></html>")
+	table += "</table>"
+	fmt.Fprintf(w, "Fresh: %d  Stale: %d\n%s</pre></body></html>\n", freshCount, staleCount, table)
 }
 
 func main() {
 	r := mux.NewRouter()
+	r.HandleFunc("/ready", ready)
+	r.HandleFunc("/live", ready)
+	go http.ListenAndServe(":8282", r)
+
+	r = mux.NewRouter()
 	r.HandleFunc("/get", get)
 	r.HandleFunc("/get/{stale}", get)
 	r.HandleFunc("/inc/{host}/{node}/{color}/{instancecount}", inc)
 
 	http.ListenAndServe(":8181", r)
+}
+
+func ready(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }

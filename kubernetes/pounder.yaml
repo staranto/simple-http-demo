@@ -1,0 +1,44 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pounder
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25% 
+  template:
+    metadata:
+      labels:
+        cdw.com/app: simple-http
+        cdw.com/app.simple-http.role: pounder
+      annotations:
+        diamanti.com/endpoint0: '{"network":"default","perfTier":"low"}'
+    spec:
+      containers:
+      - name: pounder
+        image: staranto/simple-http-pounder:amd64
+        imagePullPolicy: Always
+        command:
+        - /tmp/pounder
+        - http://counter:8181
+        - blue
+        env:
+        - name: NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8282
+          initialDelaySeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8282
+          initialDelaySeconds: 3
+...
