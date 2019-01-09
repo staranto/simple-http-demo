@@ -94,6 +94,15 @@ func get(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Fresh: %d  Stale: %d\n%s</pre></body></html>\n", freshCount, staleCount, table)
 }
 
+func clear(w http.ResponseWriter, r *http.Request) {
+	for hostname, host := range hosts {
+		threshold := time.Now().UnixNano() / int64(time.Millisecond)
+		if host.LastSeen < threshold-10000 {
+			delete(hosts, hostname)
+		}
+	}
+}
+
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/ready", ready)
@@ -104,6 +113,7 @@ func main() {
 	r.HandleFunc("/get", get)
 	r.HandleFunc("/get/{stale}", get)
 	r.HandleFunc("/inc/{host}/{node}/{color}/{instancecount}", inc)
+	r.HandleFunc("/clear", clear)
 
 	http.ListenAndServe(":8181", r)
 }

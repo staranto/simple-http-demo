@@ -13,6 +13,7 @@ services:
     image: staranto/simple-http-pounder:latest
     environment:
       NODE: "{{.Node.Hostname}}"
+      FAILCEILING: 1000
     depends_on:
       - "counter"
     deploy:
