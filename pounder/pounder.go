@@ -14,22 +14,28 @@ import (
 
 var instanceCount = 0
 var failed = false
+var useProbe = false
 
 func main() {
+
+	_, useProbe = os.LookupEnv("PROBE")
 
 	router := mux.NewRouter()
 	router.HandleFunc("/ready", ready)
 	router.HandleFunc("/live", ready)
 	go http.ListenAndServe(":8282", router)
 
+	failFloor := 500
 	failCeiling := 1000
 	if i, err := strconv.Atoi(os.Getenv("FAILCEILING")); err == nil {
-		failCeiling = i
+		if i > failCeiling {
+			failCeiling = i
+		}
 	}
 
 	s := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(s)
-	failAfter := r.Intn(failCeiling)
+	failAfterCount := r.Intn(failCeiling-failFloor) + failFloor
 
 	node := os.Getenv("NODE")
 	if node == "" {
@@ -39,8 +45,13 @@ func main() {
 
 	for {
 		instanceCount++
-		if instanceCount > failAfter {
-			failed = true
+		if instanceCount > failAfterCount {
+			log.Printf("Fail celing hit.  Using probe signal=%t", useProbe)
+			if useProbe {
+				failed = true
+			} else {
+				break
+			}
 		}
 
 		url := fmt.Sprintf("%s/inc/%s/%s/%s/%d", os.Args[1], host, node, os.Args[2], instanceCount)
@@ -48,15 +59,16 @@ func main() {
 
 		s = rand.NewSource(time.Now().UnixNano())
 		r = rand.New(s)
-		sleep := r.Intn(250)
+		sleep := r.Intn(150)
 		time.Sleep(time.Millisecond * time.Duration(sleep))
 
 		log.Printf("host=%s color=%s instanceCount=%d failAfter=%d sleep=%dms",
-			host, os.Args[1], instanceCount, failAfter, sleep)
+			host, os.Args[1], instanceCount, failAfterCount, sleep)
 	}
 }
 
 func ready(w http.ResponseWriter, r *http.Request) {
+	log.Printf("ready()=%t", failed)
 	if !failed {
 		w.WriteHeader(http.StatusOK)
 	} else {

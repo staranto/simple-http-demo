@@ -14,8 +14,14 @@ services:
     environment:
       NODE: "{{.Node.Hostname}}"
       FAILCEILING: 1000
+      PROBE: 1
     depends_on:
       - "counter"
     deploy:
       replicas: 4
+      restart_policy:
+        condition: unless-stopped
+        delay: 1s
+        max_attempts: 2
+        window: 5s
 

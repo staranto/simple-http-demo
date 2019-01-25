@@ -27,6 +27,10 @@ spec:
         - http://counter:8181
         - blue
         env:
+        - name: PROBE
+          value: "1"
+        - name: FAILCEILING
+          value: "1000"
         - name: NODE
           valueFrom:
             fieldRef:
@@ -36,6 +40,8 @@ spec:
             path: /live
             port: 8282
           initialDelaySeconds: 3
+          periodSeconds: 5
+          failureThreshold: 1
         readinessProbe:
           httpGet:
             path: /ready
