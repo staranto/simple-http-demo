@@ -46,9 +46,10 @@ metadata:
     cdw.com/app.simple-http.role: counter-service
 spec:
   ports:
-  - name: "8181"
+  - name: "p8181"
     port: 8181
     targetPort: 8181
   selector:
     cdw.com/app.simple-http.role: counter
+  type: NodePort
 ...
