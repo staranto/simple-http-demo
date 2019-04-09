@@ -43,6 +43,16 @@ func main() {
 	}
 	host, _ := os.Hostname()
 
+	color := os.Getenv("COLOR")
+	if color == "" {
+		if len(os.Args) > 2 {
+			color = os.Args[2]
+		}
+		if color == "" {
+			color = "blue"
+		}
+	}
+
 	for {
 		instanceCount++
 		if instanceCount > failAfterCount {
@@ -54,7 +64,7 @@ func main() {
 			}
 		}
 
-		url := fmt.Sprintf("%s/inc/%s/%s/%s/%d", os.Args[1], host, node, os.Args[2], instanceCount)
+		url := fmt.Sprintf("%s/inc/%s/%s/%s/%d", os.Args[1], host, node, color, instanceCount)
 		http.Get(url)
 
 		s = rand.NewSource(time.Now().UnixNano())
@@ -63,7 +73,7 @@ func main() {
 		time.Sleep(time.Millisecond * time.Duration(sleep))
 
 		log.Printf("host=%s color=%s instanceCount=%d failAfter=%d sleep=%dms",
-			host, os.Args[1], instanceCount, failAfterCount, sleep)
+			host, color, instanceCount, failAfterCount, sleep)
 	}
 }
 
