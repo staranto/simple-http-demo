@@ -1,0 +1,56 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: counter
+spec:
+  template:
+    metadata:
+      labels:
+        cdw.com/app: simple-http
+        cdw.com/app.simple-http.role: counter
+      annotations:
+        diamanti.com/endpoint0: '{"network":"default","perfTier":"low"}'
+    spec:
+      containers:
+      - name: counter
+        image: staranto/simple-http-counter:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8181
+          name: http
+        env:
+        - name: NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8282
+          initialDelaySeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8282
+          initialDelaySeconds: 3
+      restartPolicy: Always
+  replicas: 1
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: counter
+  labels:
+    cdw.com/app: simple-http
+    cdw.com/app.simple-http.role: counter-service
+spec:
+  ports:
+  - name: "http"
+    port: 8181
+    targetPort: 8181
+  selector:
+    cdw.com/app.simple-http.role: counter
+  type: NodePort
+...
