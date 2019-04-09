@@ -18,6 +18,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8181
+          name: http
         env:
         - name: NODE
           valueFrom:
@@ -46,7 +47,7 @@ metadata:
     cdw.com/app.simple-http.role: counter-service
 spec:
   ports:
-  - name: "p8181"
+  - name: "http"
     port: 8181
     targetPort: 8181
   selector:

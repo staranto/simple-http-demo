@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: pounder
-        image: staranto/simple-http-pounder:amd64
+        image: staranto/simple-http-pounder:latest
         imagePullPolicy: Always
         command:
         - /tmp/pounder
@@ -30,7 +30,7 @@ spec:
         - name: PROBE
           value: "1"
         - name: FAILCEILING
-          value: "1000"
+          value: "64000"
         - name: NODE
           valueFrom:
             fieldRef:
