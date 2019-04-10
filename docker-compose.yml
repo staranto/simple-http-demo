@@ -1,9 +1,0 @@
-version: '3'
-services:
-  counter:
-    image: staranto/simple-http-counter:amd64
-    ports:
-      - "8181:8181"
-  pounder:
-    image: staranto/simple-http-pounder:amd64
-    entrypoint: /tmp/pounder ${COLOR}
