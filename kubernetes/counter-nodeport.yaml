@@ -7,8 +7,8 @@ spec:
   template:
     metadata:
       labels:
-        cdw.com/app: simple-http
-        cdw.com/app.simple-http.role: counter
+        taranto.dev/app: simple-http
+        taranto.dev/app.simple-http.role: counter
       annotations:
         diamanti.com/endpoint0: '{"network":"default","perfTier":"low"}'
     spec:
@@ -43,14 +43,14 @@ kind: Service
 metadata:
   name: counter
   labels:
-    cdw.com/app: simple-http
-    cdw.com/app.simple-http.role: counter-service
+    taranto.dev/app: simple-http
+    taranto.dev/app.simple-http.role: counter-service
 spec:
   ports:
   - name: "http"
     port: 8181
     targetPort: 8181
   selector:
-    cdw.com/app.simple-http.role: counter
+    taranto.dev/app.simple-http.role: counter
   type: NodePort
 ...

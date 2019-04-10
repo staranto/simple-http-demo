@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  
+  counter:
+    image: staranto/simple-http-counter:latest
+    environment:
+      NODE: "{{.Node.Hostname}}"
+    ports:
+      - "8181:8181"
+    deploy:
+      placement:
+        constraints: [node.labels.taranto.dev.size == tiny]
+
+  pounder:
+    image: staranto/simple-http-pounder:latest
+    environment:
+      NODE: "{{.Node.Hostname}}"
+      FAILCEILING: 1000
+      PROBE: 1
+    depends_on:
+      - "counter"
+    deploy:
+      replicas: 4
+      restart_policy:
+        condition: any
+        delay: 1s
+        window: 5s
+
