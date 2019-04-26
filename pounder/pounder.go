@@ -21,7 +21,7 @@ func main() {
 	_, useProbe = os.LookupEnv("PROBE")
 
 	router := mux.NewRouter()
-	router.HandleFunc("/ready", ready)
+	// router.HandleFunc("/ready", ready)
 	router.HandleFunc("/live", ready)
 	go http.ListenAndServe(":8282", router)
 
@@ -82,6 +82,6 @@ func ready(w http.ResponseWriter, r *http.Request) {
 	if !failed {
 		w.WriteHeader(http.StatusOK)
 	} else {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusServiceUnavailable)
 	}
 }

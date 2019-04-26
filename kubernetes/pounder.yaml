@@ -42,9 +42,4 @@ spec:
           initialDelaySeconds: 3
           periodSeconds: 5
           failureThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8282
-          initialDelaySeconds: 3
 ...
