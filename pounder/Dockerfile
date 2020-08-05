@@ -1,10 +1,18 @@
-ARG DFROM
-FROM ${DFROM}
+FROM golang:1.13.4 AS builder
 
-ARG ARCH
-COPY build/pounder.${ARCH} /tmp/pounder
+COPY . /tmp
+WORKDIR /tmp
 
-HEALTHCHECK --interval=2s --timeout=1s --start-period=10s --retries=1 \
-    CMD wget --quiet --tries=1 --spider http://localhost:8282/live || exit 1
+RUN go get -u github.com/gorilla/mux
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux \
+    GOARCH=${TARGETARCH} \
+    go build -o /tmp/pounder pounder.go
+RUN chmod +x /tmp/pounder
 
-CMD ["/tmp/pounder", "http://counter:8181", "blue"]
+
+FROM alpine
+
+COPY --from=builder /tmp/pounder /tmp/pounder
+
+CMD ["/tmp/pounder"]
